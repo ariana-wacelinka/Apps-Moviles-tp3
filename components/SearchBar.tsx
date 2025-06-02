@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -20,15 +21,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Buscar...",
   onClear,
 }) => {
+  const theme = useTheme();
+  
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.inputContainer, { backgroundColor: theme.dark ? theme.colors.card : '#f0f0f0' }]}>
         
         
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.colors.text }]}
           placeholder={placeholder}
-          placeholderTextColor="#888"
+          placeholderTextColor={theme.dark ? '#888' : '#888'}
           value={value}
           onChangeText={onChangeText}
           onFocus={onFocus}
@@ -39,10 +42,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         />
         {value.length > 0 && onClear && (
           <TouchableOpacity onPress={onClear} style={styles.clearButton}>
-            <Text style={styles.clearIcon}>✕</Text>
+            <Text style={[styles.clearIcon, { color: theme.colors.text }]}>✕</Text>
           </TouchableOpacity>
         )}
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Text style={[styles.searchIcon, { color: theme.colors.text }]}>🔍</Text>
       </View>
     </View>
   );
@@ -51,24 +54,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    backgroundColor: '#fff',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
     borderRadius: 25,
     paddingHorizontal: 15,
     height: 48,
   },
   searchIcon: {
     fontSize: 18,
-    color: '#666',
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
   },
   clearButton: {
     padding: 5,
@@ -76,7 +75,6 @@ const styles = StyleSheet.create({
   },
   clearIcon: {
     fontSize: 16,
-    color: '#666',
   }
 });
 

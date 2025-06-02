@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -18,6 +19,7 @@ import { Category } from '../../types/categories';
 import { MealPreview } from '../../types/recipes';
 
 export default function CategoryDetailsScreen() {
+  const theme = useTheme();
   const { categoryName } = useLocalSearchParams();
   const categoryNameStr = Array.isArray(categoryName) ? categoryName[0] : categoryName;
   
@@ -87,10 +89,9 @@ export default function CategoryDetailsScreen() {
   const handleGoBack = () => {
     router.back();
   };
-
   if (isLoadingCategory) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" style={styles.loader} />
       </SafeAreaView>
     );
@@ -98,31 +99,28 @@ export default function CategoryDetailsScreen() {
 
   if (errorCategory) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorCategory}</Text>
-          <TouchableOpacity style={styles.goBackButton} onPress={handleGoBack}>
+          <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorCategory}</Text>
+          <TouchableOpacity style={[styles.goBackButton, { backgroundColor: theme.colors.primary }]} onPress={handleGoBack}>
             <Text style={styles.goBackText}>Volver</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
-
   return (
     <><Stack.Screen
-          options={{ title: categoryNameStr || 'Detalles de Categoría' }} /><SafeAreaView style={styles.container} edges={['bottom']}>
+          options={{ title: categoryNameStr || 'Detalles de Categoría' }} /><SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['bottom']}>
               <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                  {/* Category details section */}
                   {category && (
-                      <View style={styles.categorySection}>
+                      <View style={[styles.categorySection, { borderBottomColor: theme.colors.border }]}>
                           <View style={styles.categoryHeader}>
                               <Image
                                   source={{ uri: category.strCategoryThumb }}
                                   style={styles.categoryImage} />
                               <View style={styles.categoryInfo}>
-                                  
-                                  <Text style={styles.categoryDescription} numberOfLines={0}>
+                                  <Text style={[styles.categoryDescription, { color: theme.colors.text }]} numberOfLines={0}>
                                       {category.strCategoryDescription}
                                   </Text>
                               </View>
@@ -130,9 +128,8 @@ export default function CategoryDetailsScreen() {
                       </View>
                   )}
 
-                  {/* Recipes section */}
                   <View style={styles.recipesSection}>
-                      <Text style={styles.sectionTitle}>
+                      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
                           Recetas de {categoryName} ({recipes.length})
                       </Text>
 
@@ -141,11 +138,11 @@ export default function CategoryDetailsScreen() {
                       )}
 
                       {errorRecipes && (
-                          <Text style={styles.errorText}>{errorRecipes}</Text>
+                          <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorRecipes}</Text>
                       )}
 
                       {!isLoadingRecipes && !errorRecipes && recipes.length === 0 && (
-                          <Text style={styles.infoText}>
+                          <Text style={[styles.infoText, { color: theme.colors.text }]}>
                               No se encontraron recetas para esta categoría.
                           </Text>
                       )}
@@ -172,13 +169,11 @@ export default function CategoryDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   backButton: {
     paddingVertical: 5,
@@ -194,7 +189,6 @@ const styles = StyleSheet.create({
   categorySection: {
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -212,12 +206,10 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 8,
   },
   categoryDescription: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
   },
   recipesSection: {
@@ -226,7 +218,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 15,
   },
   recipesList: {
@@ -244,20 +235,17 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: 'center',
     marginTop: 20,
-    color: 'red',
     fontSize: 16,
   },
   infoText: {
     textAlign: 'center',
     marginTop: 20,
-    color: 'gray',
     fontSize: 16,
   },
   goBackButton: {
     marginTop: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#007AFF',
     borderRadius: 8,
   },
   goBackText: {

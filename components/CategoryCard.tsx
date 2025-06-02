@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
@@ -10,6 +11,8 @@ interface CategoryCardProps {
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress }) => {
+  const theme = useTheme();
+  
   const handlePress = () => {
     if (onPress) {
       onPress(category);
@@ -19,38 +22,61 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress }) => {
         pathname: '/category/[categoryName]',
         params: { categoryName: category.strCategory }
       });
+    }  };
+
+  const cardBgColor = theme.colors.card;
+  
+  const addOpacityToColor = (color: string, opacity: number) => {
+    if (color.includes('rgba')) return color;
+    
+    if (color.includes('rgb(')) {
+      return color.replace('rgb(', 'rgba(').replace(')', `, ${opacity})`);
     }
+
+    if (color.startsWith('#')) {
+      const hex = color.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    
+    return theme.dark ? `rgba(44, 44, 46, ${opacity})` : `rgba(240, 240, 240, ${opacity})`;
   };
 
   return (
     <TouchableOpacity 
-      style={styles.cardContainer} 
+      style={[styles.cardContainer, { backgroundColor: cardBgColor }]} 
       onPress={handlePress}
       activeOpacity={0.7}
     >
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{category.strCategory}</Text>
+        <Text style={[styles.name, { color: theme.colors.text }]}>{category.strCategory}</Text>
       </View>
       <View style={styles.imageWrapper}>
         <Image source={{ uri: category.strCategoryThumb }} style={styles.image} />
         <LinearGradient
-          colors={['transparent', 'transparent', 'rgba(240,240,240,0)', 'rgba(240,240,240,0.3)', '#f0f0f0']}
+          colors={[
+            'transparent', 
+            'transparent', 
+            addOpacityToColor(cardBgColor, 0), 
+            addOpacityToColor(cardBgColor, 0.3), 
+            cardBgColor
+          ]}
           locations={[0, 0.3, 0.6, 0.8, 1]}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 0 }}
           style={styles.fadeGradient}
           pointerEvents="none"
         />
-        {/* <LinearGradient
-          colors={['transparent', 'transparent', 'rgba(240,240,240,0)', 'rgba(240,240,240,0.5)', '#f0f0f0']}
-          locations={[0, 0.3, 0.6, 0.8, 1]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          style={styles.fadeGradient}
-          pointerEvents="none"
-        /> */}
         <LinearGradient
-          colors={['transparent', 'transparent', 'rgba(240,240,240,0)', 'rgba(240,240,240,0.3)', '#f0f0f0']}
+          colors={[
+            'transparent', 
+            'transparent', 
+            addOpacityToColor(cardBgColor, 0), 
+            addOpacityToColor(cardBgColor, 0.3), 
+            cardBgColor
+          ]}
           locations={[0, 0.3, 0.6, 0.8, 1]}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 0 }}
@@ -66,11 +92,9 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#f0f0f0',
     borderRadius: 8,
     marginVertical: 5,
     paddingLeft: 10,
-    //paddingTop: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -115,7 +139,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
   },
 });
 

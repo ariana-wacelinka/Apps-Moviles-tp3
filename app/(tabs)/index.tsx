@@ -1,17 +1,18 @@
-// app/(tabs)/search.tsx
-import { useFocusEffect } from '@react-navigation/native'; // Para recargar categorías al enfocar la pestaña
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import CategoryCard from '../../components/CategoryCard'; // Importa tu componente CategoryCard
+import CategoryCard from '../../components/CategoryCard';
 import MealSearchCard from '../../components/MealSearchCard';
-import SearchBar from '../../components/SearchBar'; // Importa tu componente SearchBar
+import SearchBar from '../../components/SearchBar';
+import { ThemeToggleButton } from '../../components/ThemeToggleButton';
 import { getAllCategories, searchRecipesByName } from '../../services/theMealDbService';
-import { Category } from '../../types/categories'; // Asegúrate de que la ruta sea correcta
+import { Category } from '../../types/categories';
 import { Meal } from '../../types/recipes';
 
 export default function SearchScreen() {
+  const theme = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -79,9 +80,9 @@ export default function SearchScreen() {
   const renderContent = () => {
     if (isSearchFocused && searchQuery.trim().length > 0) {
       if (isLoadingSearch) return <ActivityIndicator size="large" style={styles.loader} />;
-      if (errorSearch) return <Text style={styles.errorText}>{errorSearch}</Text>;
+      if (errorSearch) return <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorSearch}</Text>;
       if (searchResults.length === 0 && searchQuery.trim().length > 2 && !isLoadingSearch) {
-        return <Text style={styles.infoText}>No se encontraron recetas para "{searchQuery}"</Text>;
+        return <Text style={[styles.infoText, { color: theme.colors.text }]}>No se encontraron recetas para "{searchQuery}"</Text>;
       }
       return (
         <FlatList
@@ -95,7 +96,7 @@ export default function SearchScreen() {
       );
     } else {
       if (isLoadingCategories) return <ActivityIndicator size="large" style={styles.loader} />;
-      if (errorCategories) return <Text style={styles.errorText}>{errorCategories}</Text>;
+      if (errorCategories) return <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorCategories}</Text>;
       return (
         
         <FlatList
@@ -111,8 +112,11 @@ export default function SearchScreen() {
             </View>
           )}
           contentContainerStyle={styles.listContainer}
-          ListHeaderComponent={<View>
-          <Text style={styles.headerTitle}>Explora nuestras categorías</Text></View>}
+          ListHeaderComponent={
+            <View>
+              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Explora nuestras categorías</Text>
+            </View>
+          }
         />
         
       );
@@ -120,7 +124,13 @@ export default function SearchScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
+      <View style={styles.header}>
+        <View style={styles.headerLeft} />
+        <View style={styles.headerRight}>
+          <ThemeToggleButton />
+        </View>
+      </View>
       <SearchBar
         placeholder="Busca recetas o ingredientes..."
         value={searchQuery}
@@ -135,7 +145,20 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  headerRight: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   list: {
     marginHorizontal: 10,
@@ -158,12 +181,10 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: 'center',
     marginTop: 20,
-    color: 'red',
   },
   infoText: {
     textAlign: 'center',
     marginTop: 20,
-    color: 'gray',
   },
   headerTitle: {
     fontSize: 20,

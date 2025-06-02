@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MealPreview } from '../types/recipes';
@@ -9,18 +10,23 @@ interface MealSearchCardProps {
 }
 
 const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress, category }) => {
+  const theme = useTheme();
+  
   return (
     <TouchableOpacity
-      style={styles.cardContainer}
+      style={[styles.cardContainer, { 
+        backgroundColor: theme.colors.card,
+        borderColor: theme.colors.border 
+      }]}
       onPress={() => onPress && onPress(meal)}
       activeOpacity={0.7}
     >
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
       <View style={styles.textContainer}>
-        <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+        <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={2} ellipsizeMode="tail">
           {meal.strMeal}
         </Text>
-        <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
+        <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1} ellipsizeMode="tail">
           {category}
         </Text>
       </View>
@@ -32,7 +38,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     borderRadius: 8,
     marginVertical: 4,
     padding: 10,
@@ -45,7 +50,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1.00,
     elevation: 1,
     borderWidth: 1,
-    borderColor: '#eee'
   },
   image: {
     width: 70,
@@ -60,12 +64,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 4,
   },
   category: {
     fontSize: 13,
-    color: '#666',
   },
 });
 
