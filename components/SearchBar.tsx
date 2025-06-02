@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     fontSize: 18,
-    //marginRight: 8,
     color: '#666',
   },
   input: {
