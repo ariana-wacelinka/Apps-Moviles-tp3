@@ -98,79 +98,74 @@ export default function CategoryDetailsScreen() {
 
   if (errorCategory) {
     return (
+      <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{errorCategory}</Text>
           <TouchableOpacity style={styles.goBackButton} onPress={handleGoBack}>
             <Text style={styles.goBackText}>Volver</Text>
           </TouchableOpacity>
         </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    
-      <><Stack.Screen options={{ headerShown: false }} /><SafeAreaView style={styles.container} edges={['top']}>
-          {/* Header with back button */}
-          <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-                  <Text style={styles.backButtonText}>← Volver</Text>
-              </TouchableOpacity>
-          </View>
-
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              {/* Category details section */}
-              {category && (
-                  <View style={styles.categorySection}>
-                      <View style={styles.categoryHeader}>
-                          <Image
-                              source={{ uri: category.strCategoryThumb }}
-                              style={styles.categoryImage} />
-                          <View style={styles.categoryInfo}>
-                              <Text style={styles.categoryName}>{category.strCategory}</Text>
-                              <Text style={styles.categoryDescription} numberOfLines={0}>
-                                  {category.strCategoryDescription}
-                              </Text>
+    <><Stack.Screen
+          options={{ title: categoryNameStr || 'Detalles de Categoría' }} /><SafeAreaView style={styles.container} edges={['bottom']}>
+              <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                  {/* Category details section */}
+                  {category && (
+                      <View style={styles.categorySection}>
+                          <View style={styles.categoryHeader}>
+                              <Image
+                                  source={{ uri: category.strCategoryThumb }}
+                                  style={styles.categoryImage} />
+                              <View style={styles.categoryInfo}>
+                                  
+                                  <Text style={styles.categoryDescription} numberOfLines={0}>
+                                      {category.strCategoryDescription}
+                                  </Text>
+                              </View>
                           </View>
                       </View>
-                  </View>
-              )}
-
-              {/* Recipes section */}
-              <View style={styles.recipesSection}>
-                  <Text style={styles.sectionTitle}>
-                      Recetas de {categoryName} ({recipes.length})
-                  </Text>
-
-                  {isLoadingRecipes && (
-                      <ActivityIndicator size="large" style={styles.loader} />
                   )}
 
-                  {errorRecipes && (
-                      <Text style={styles.errorText}>{errorRecipes}</Text>
-                  )}
-
-                  {!isLoadingRecipes && !errorRecipes && recipes.length === 0 && (
-                      <Text style={styles.infoText}>
-                          No se encontraron recetas para esta categoría.
+                  {/* Recipes section */}
+                  <View style={styles.recipesSection}>
+                      <Text style={styles.sectionTitle}>
+                          Recetas de {categoryName} ({recipes.length})
                       </Text>
-                  )}
 
-                  {recipes.length > 0 && (
-                      <FlatList
-                          data={recipes}
-                          keyExtractor={(item) => item.idMeal}
-                          renderItem={({ item }) => (
-                              <MealSearchCard
-                                  meal={item}
-                                  category={categoryNameStr}
-                                  onPress={handleMealPress} />
-                          )}
-                          scrollEnabled={false}
-                          contentContainerStyle={styles.recipesList} />
-                  )}
-              </View>
-          </ScrollView>
-      </SafeAreaView></>
+                      {isLoadingRecipes && (
+                          <ActivityIndicator size="large" style={styles.loader} />
+                      )}
+
+                      {errorRecipes && (
+                          <Text style={styles.errorText}>{errorRecipes}</Text>
+                      )}
+
+                      {!isLoadingRecipes && !errorRecipes && recipes.length === 0 && (
+                          <Text style={styles.infoText}>
+                              No se encontraron recetas para esta categoría.
+                          </Text>
+                      )}
+
+                      {recipes.length > 0 && (
+                          <FlatList
+                              data={recipes}
+                              keyExtractor={(item) => item.idMeal}
+                              renderItem={({ item }) => (
+                                  <MealSearchCard
+                                      meal={item}
+                                      category={categoryNameStr}
+                                      onPress={handleMealPress} />
+                              )}
+                              scrollEnabled={false}
+                              contentContainerStyle={styles.recipesList} />
+                      )}
+                  </View>
+              </ScrollView>
+          </SafeAreaView></>
   );
 }
 
