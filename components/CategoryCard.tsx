@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Category } from '../types/categories';
@@ -9,10 +10,22 @@ interface CategoryCardProps {
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress }) => {
+  const handlePress = () => {
+    if (onPress) {
+      onPress(category);
+    } else {
+      // Navigate to category details page
+      router.push({
+        pathname: '/category/[categoryName]',
+        params: { categoryName: category.strCategory }
+      });
+    }
+  };
+
   return (
     <TouchableOpacity 
       style={styles.cardContainer} 
-      onPress={() => onPress && onPress(category)}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <View style={styles.textContainer}>

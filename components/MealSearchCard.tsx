@@ -1,15 +1,14 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Meal } from '../types/recipes';
+import { MealPreview } from '../types/recipes';
 
 interface MealSearchCardProps {
-  meal: Meal;
-  onPress?: (meal: Meal) => void;
+  meal: MealPreview;
+  onPress?: (meal: MealPreview) => void;
+  category?: string;
 }
 
-const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress }) => {
-  const mealCategory = meal.strCategory;
-
+const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress, category }) => {
   return (
     <TouchableOpacity
       style={styles.cardContainer}
@@ -22,7 +21,7 @@ const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress }) => {
           {meal.strMeal}
         </Text>
         <Text style={styles.category} numberOfLines={1} ellipsizeMode="tail">
-          {mealCategory}
+          {category}
         </Text>
       </View>
     </TouchableOpacity>

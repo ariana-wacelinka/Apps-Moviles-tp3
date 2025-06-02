@@ -57,3 +57,13 @@ export interface Meal {
 export interface MealsResponse {
   meals: Meal[] | null;
 }
+
+export interface MealPreview {
+  idMeal: string;
+  strMeal: string;
+  strMealThumb: string;
+}
+
+export interface MealPreviewsResponse {
+  meals: MealPreview[] | null;
+}

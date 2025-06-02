@@ -1,5 +1,5 @@
 import { CategoriesResponse } from '../types/categories';
-import { Meal, MealsResponse } from '../types/recipes';
+import { Meal, MealPreviewsResponse, MealsResponse } from '../types/recipes';
 
 const API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1/';
 
@@ -45,13 +45,13 @@ export const getRecipeDetailsById = async (id: string): Promise<Meal | null> => 
     }
 };
 
-export const getRecipesByCategory = async (category: string): Promise<MealsResponse> => {
+export const getRecipesByCategory = async (category: string): Promise<MealPreviewsResponse> => {
     try {
         const response = await fetch(`${API_BASE_URL}filter.php?c=${encodeURIComponent(category)}`);
         if (!response.ok) {
             throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
         }
-        const data: MealsResponse = await response.json();
+        const data: MealPreviewsResponse = await response.json();
         return data;
     } catch (error) {
         console.error(`Error al obtener recetas por categoría ${category}:`, error);
