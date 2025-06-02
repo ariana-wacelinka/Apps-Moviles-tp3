@@ -43,13 +43,13 @@ export default function TabTwoScreen() {
       <Collapsible title="Android, iOS, and web support">
         <ThemedText>
           You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
+          <ThemedText type="defaultSemiBold">w</ThemedText>{' '}in the terminal running this project.
         </ThemedText>
       </Collapsible>
       <Collapsible title="Images">
         <ThemedText>
           For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
+          <ThemedText type="defaultSemiBold">@3x</ThemedText>{' '}suffixes to provide files for
           different screen densities
         </ThemedText>
         <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
@@ -59,7 +59,7 @@ export default function TabTwoScreen() {
       </Collapsible>
       <Collapsible title="Custom fonts">
         <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
+          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText>{' '}to see how to load{' '}
           <ThemedText style={{ fontFamily: 'SpaceMono' }}>
             custom fonts such as this one.
           </ThemedText>
@@ -71,7 +71,7 @@ export default function TabTwoScreen() {
       <Collapsible title="Light and dark mode components">
         <ThemedText>
           This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
+          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText>{' '}hook lets you inspect
           what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
         </ThemedText>
         <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
@@ -81,7 +81,7 @@ export default function TabTwoScreen() {
       <Collapsible title="Animations">
         <ThemedText>
           This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
+          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText>{' '}component uses
           the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
           library to create a waving hand animation.
         </ThemedText>

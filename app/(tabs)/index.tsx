@@ -1,4 +1,4 @@
-import { useFocusEffect, useTheme } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,12 +7,15 @@ import CategoryCard from '../../components/CategoryCard';
 import MealSearchCard from '../../components/MealSearchCard';
 import SearchBar from '../../components/SearchBar';
 import { ThemeToggleButton } from '../../components/ThemeToggleButton';
+import { Colors } from '../../constants/Colors';
+import { useTheme } from '../../contexts/ThemeContext';
 import { getAllCategories, searchRecipesByName } from '../../services/theMealDbService';
 import { Category } from '../../types/categories';
 import { Meal } from '../../types/recipes';
 
 export default function SearchScreen() {
-  const theme = useTheme();
+  const { effectiveTheme } = useTheme();
+  const themeColors = effectiveTheme === 'dark' ? Colors.dark : Colors.light;
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -80,9 +83,9 @@ export default function SearchScreen() {
   const renderContent = () => {
     if (isSearchFocused && searchQuery.trim().length > 0) {
       if (isLoadingSearch) return <ActivityIndicator size="large" style={styles.loader} />;
-      if (errorSearch) return <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorSearch}</Text>;
+      if (errorSearch) return <Text style={[styles.errorText, { color: themeColors.text }]}>{errorSearch}</Text>;
       if (searchResults.length === 0 && searchQuery.trim().length > 2 && !isLoadingSearch) {
-        return <Text style={[styles.infoText, { color: theme.colors.text }]}>No se encontraron recetas para "{searchQuery}"</Text>;
+        return <Text style={[styles.infoText, { color: themeColors.text }]}>No se encontraron recetas para "{searchQuery}"</Text>;
       }
       return (
         <FlatList
@@ -90,13 +93,13 @@ export default function SearchScreen() {
           style={styles.list}
           data={searchResults}
           keyExtractor={(item) => item.idMeal}
-          renderItem={({ item }) => <MealSearchCard meal={item} />}
+          renderItem={({ item }) => <MealSearchCard meal={item} category={item.strCategory} />}
           contentContainerStyle={styles.listContainer}
         />
       );
     } else {
       if (isLoadingCategories) return <ActivityIndicator size="large" style={styles.loader} />;
-      if (errorCategories) return <Text style={[styles.errorText, { color: theme.colors.notification }]}>{errorCategories}</Text>;
+      if (errorCategories) return <Text style={[styles.errorText, { color: themeColors.text }]}>{errorCategories}</Text>;
       return (
         
         <FlatList
@@ -114,7 +117,7 @@ export default function SearchScreen() {
           contentContainerStyle={styles.listContainer}
           ListHeaderComponent={
             <View>
-              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Explora nuestras categorías</Text>
+              <Text style={[styles.headerTitle, { color: themeColors.text }]}>Explora nuestras categorías</Text>
             </View>
           }
         />
@@ -124,7 +127,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]} edges={['top']}>
       <View style={styles.header}>
         <View style={styles.headerLeft} />
         <View style={styles.headerRight}>

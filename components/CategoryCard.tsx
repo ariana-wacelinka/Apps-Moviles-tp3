@@ -14,17 +14,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress }) => {
   const theme = useTheme();
   
   const handlePress = () => {
-    if (onPress) {
-      onPress(category);
-    } else {
-      // Navigate to category details page
       router.push({
         pathname: '/category/[categoryName]',
         params: { categoryName: category.strCategory }
       });
-    }  };
+     };
 
-  const cardBgColor = theme.colors.card;
+  const cardBgColor = theme.colors.card;    
   
   const addOpacityToColor = (color: string, opacity: number) => {
     if (color.includes('rgba')) return color;

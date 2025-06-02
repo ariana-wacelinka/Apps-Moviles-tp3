@@ -18,9 +18,9 @@ const THEME_STORAGE_KEY = '@recetapp:theme';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setThemeState] = useState<ThemeType>('auto');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const effectiveTheme = theme === 'auto' ? (systemColorScheme ?? 'light') : theme;
-
   useEffect(() => {
     const loadSavedTheme = async () => {
       try {
@@ -30,6 +30,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error('Error loading saved theme:', error);
+      } finally {
+        setIsLoaded(true);
       }
     };
 
@@ -50,9 +52,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       theme === 'auto' ? 'light' :
       theme === 'light' ? 'dark' : 'auto';
     setTheme(nextTheme);
-  };
-
-  return (
+  };  return (
     <ThemeContext.Provider value={{
       theme,
       effectiveTheme,

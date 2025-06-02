@@ -6,15 +6,18 @@ import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme as useNavigationTheme } from '@react-navigation/native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { effectiveTheme } = useTheme();
+  const navigationTheme = useNavigationTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: effectiveTheme === 'dark' ? Colors.dark.tabIconSelected : Colors.light.tabIconSelected,
+        tabBarInactiveTintColor: effectiveTheme === 'dark' ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -22,8 +25,8 @@ export default function TabLayout() {
           ios: {
             position: 'absolute',
           },
-          default: {},
         }),
+        sceneStyle: { backgroundColor: navigationTheme.colors.background },
       }}>
       <Tabs.Screen
         name="index"

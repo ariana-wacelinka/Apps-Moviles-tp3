@@ -9,7 +9,11 @@ interface MealSearchCardProps {
   category?: string;
 }
 
-const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress, category }) => {
+const handleMealPress = (meal: MealPreview) => {
+    console.log('Meal selected:', meal.idMeal);
+  };  
+
+const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, category }) => {
   const theme = useTheme();
   
   return (
@@ -18,7 +22,7 @@ const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress, category
         backgroundColor: theme.colors.card,
         borderColor: theme.colors.border 
       }]}
-      onPress={() => onPress && onPress(meal)}
+      onPress={() => handleMealPress(meal)}
       activeOpacity={0.7}
     >
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
@@ -26,9 +30,11 @@ const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, onPress, category
         <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={2} ellipsizeMode="tail">
           {meal.strMeal}
         </Text>
-        <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1} ellipsizeMode="tail">
-          {category}
-        </Text>
+        {category != null && (
+          <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1} ellipsizeMode="tail">
+            {category}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );
