@@ -139,6 +139,9 @@ export default function SearchScreen() {
         value={searchQuery}
         onChangeText={setSearchQuery}
         onFocus={() => setIsSearchFocused(true)}
+        onClear={() => {
+          setSearchQuery('');
+        }}
       />
       {renderContent()}
     </SafeAreaView>

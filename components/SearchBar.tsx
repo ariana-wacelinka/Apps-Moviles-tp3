@@ -45,7 +45,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <Text style={[styles.clearIcon, { color: theme.colors.text }]}>✕</Text>
           </TouchableOpacity>
         )}
-        <Text style={[styles.searchIcon, { color: theme.colors.text }]}>🔍</Text>
+        {(value.length === 0 || value == null) && (
+            <Text style={[styles.searchIcon, { color: theme.colors.text }]}>🔍</Text>
+            )}
       </View>
     </View>
   );
