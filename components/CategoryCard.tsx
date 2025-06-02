@@ -28,14 +28,14 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress }) => {
           style={styles.fadeGradient}
           pointerEvents="none"
         />
-        <LinearGradient
+        {/* <LinearGradient
           colors={['transparent', 'transparent', 'rgba(240,240,240,0)', 'rgba(240,240,240,0.5)', '#f0f0f0']}
           locations={[0, 0.3, 0.6, 0.8, 1]}
           start={{ x: 0, y: 1 }}
           end={{ x: 0, y: 0 }}
           style={styles.fadeGradient}
           pointerEvents="none"
-        />
+        /> */}
         <LinearGradient
           colors={['transparent', 'transparent', 'rgba(240,240,240,0)', 'rgba(240,240,240,0.3)', '#f0f0f0']}
           locations={[0, 0.3, 0.6, 0.8, 1]}
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 6,
     paddingLeft: 10,
-    paddingTop: 10,
+    //paddingTop: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     width: 80,
-    height: 90,
+    height: 100,
     overflow: 'hidden',
     marginRight: 0,
     position: 'relative',
@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     justifyContent: 'flex-start',
+    marginTop: 5,
   },
   name: {
     fontSize: 14,
