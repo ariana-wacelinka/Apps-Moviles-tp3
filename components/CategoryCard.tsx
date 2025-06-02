@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
-    marginVertical: 6,
+    marginVertical: 5,
     paddingLeft: 10,
     //paddingTop: 10,
     shadowColor: '#000',
