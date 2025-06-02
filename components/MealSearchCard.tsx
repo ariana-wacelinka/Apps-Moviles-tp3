@@ -2,6 +2,7 @@ import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MealPreview } from '../types/recipes';
+import FavoriteButton from './FavoriteButton';
 
 interface MealSearchCardProps {
   meal: MealPreview;
@@ -10,28 +11,31 @@ interface MealSearchCardProps {
 }
 
 const handleMealPress = (meal: MealPreview) => {
-    console.log('Meal selected:', meal.idMeal);
-  };  
+  console.log('Meal selected:', meal.idMeal);
+};
 
 const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, category }) => {
   const theme = useTheme();
-  
+
   return (
     <TouchableOpacity
-      style={[styles.cardContainer, { 
+      style={[styles.cardContainer, {
         backgroundColor: theme.colors.card,
-        borderColor: theme.colors.border 
+        borderColor: theme.colors.border
       }]}
       onPress={() => handleMealPress(meal)}
       activeOpacity={0.7}
     >
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={2} ellipsizeMode="tail">
-          {meal.strMeal}
-        </Text>
-        {category != null && (
-          <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1} ellipsizeMode="tail">
+        <View style={styles.textContainer}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={2}>
+            {meal.strMeal}
+            </Text>
+            <FavoriteButton meal={meal} />
+          </View>
+          {category != null && (
+            <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1}>
             {category}
           </Text>
         )}
