@@ -97,6 +97,7 @@ export default function SearchScreen() {
       if (isLoadingCategories) return <ActivityIndicator size="large" style={styles.loader} />;
       if (errorCategories) return <Text style={styles.errorText}>{errorCategories}</Text>;
       return (
+        
         <FlatList
           key="categories-grid"
           style={styles.list}
@@ -110,8 +111,10 @@ export default function SearchScreen() {
             </View>
           )}
           contentContainerStyle={styles.listContainer}
-          ListHeaderComponent={<Text style={styles.headerTitle}>Explorar Categorías</Text>}
+          ListHeaderComponent={<View>
+          <Text style={styles.headerTitle}>Explora nuestras categorías</Text></View>}
         />
+        
       );
     }
   };
