@@ -1,75 +1,171 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+// app/(tabs)/search.tsx
+import { useFocusEffect } from '@react-navigation/native'; // Para recargar categorías al enfocar la pestaña
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import CategoryCard from '../../components/CategoryCard'; // Importa tu componente CategoryCard
+import MealSearchCard from '../../components/MealSearchCard';
+import SearchBar from '../../components/SearchBar'; // Importa tu componente SearchBar
+import { getAllCategories, searchRecipesByName } from '../../services/theMealDbService';
+import { Category } from '../../types/categories'; // Asegúrate de que la ruta sea correcta
+import { Meal } from '../../types/recipes';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+export default function SearchScreen() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [errorCategories, setErrorCategories] = useState<string | null>(null);
+
+  const [searchResults, setSearchResults] = useState<Meal[]>([]);
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
+  const [errorSearch, setErrorSearch] = useState<string | null>(null);
+
+  const fetchCategories = async () => {
+    setIsLoadingCategories(true);
+    setErrorCategories(null);
+    try {
+      const response = await getAllCategories();
+      if (response.categories) {
+        setCategories(response.categories);
+      } else {
+        setErrorCategories('No se pudieron cargar las categorías.');
+      }
+    } catch (err) {
+      setErrorCategories('Error al cargar categorías.');
+      console.error(err);
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+      setIsSearchFocused(false); 
+      setSearchQuery('');
+    }, [])
+  );
+
+  useEffect(() => {
+    if (searchQuery.trim().length > 2 && isSearchFocused) {
+      const handler = setTimeout(async () => {
+        setIsLoadingSearch(true);
+        setErrorSearch(null);
+        setSearchResults([]);
+        try {
+          const response = await searchRecipesByName(searchQuery.trim());
+          if (response.meals) {
+            setSearchResults(response.meals);
+          } else {
+            setErrorSearch('No se encontraron recetas para esta búsqueda.');
+          }
+        } catch (err) {
+          setErrorSearch('Error al buscar recetas.');
+          console.error(err);
+        } finally {
+          setIsLoadingSearch(false);
+        }
+      }, 500);
+
+      return () => clearTimeout(handler);
+    } else if (searchQuery.trim().length === 0) {
+        setSearchResults([]);
+    }
+  }, [searchQuery, isSearchFocused]);
+
+  const renderContent = () => {
+    if (isSearchFocused && searchQuery.trim().length > 0) {
+      if (isLoadingSearch) return <ActivityIndicator size="large" style={styles.loader} />;
+      if (errorSearch) return <Text style={styles.errorText}>{errorSearch}</Text>;
+      if (searchResults.length === 0 && searchQuery.trim().length > 2 && !isLoadingSearch) {
+        return <Text style={styles.infoText}>No se encontraron recetas para "{searchQuery}"</Text>;
+      }
+      return (
+        <FlatList
+          key="search-results"
+          style={styles.list}
+          data={searchResults}
+          keyExtractor={(item) => item.idMeal}
+          renderItem={({ item }) => <MealSearchCard meal={item} />}
+          contentContainerStyle={styles.listContainer}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      );
+    } else {
+      if (isLoadingCategories) return <ActivityIndicator size="large" style={styles.loader} />;
+      if (errorCategories) return <Text style={styles.errorText}>{errorCategories}</Text>;
+      return (
+        <FlatList
+          key="categories-grid"
+          style={styles.list}
+          data={categories}
+          keyExtractor={(item) => item.idCategory}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          renderItem={({ item }) => (
+            <View style={styles.columnItem}>
+              <CategoryCard category={item} />
+            </View>
+          )}
+          contentContainerStyle={styles.listContainer}
+          ListHeaderComponent={<Text style={styles.headerTitle}>Explorar Categorías</Text>}
+        />
+      );
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <SearchBar
+        placeholder="Busca recetas o ingredientes..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onFocus={() => setIsSearchFocused(true)}
+      />
+      {renderContent()}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  list: {
+    marginHorizontal: 10,
+    flex: 1,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  row: {
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
+  columnItem: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  listContainer: {
+    paddingHorizontal: 0,
+  },
+  loader: {
+    marginTop: 20,
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: 'red',
+  },
+  infoText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: 'gray',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 15,
+    marginLeft: 5,
+  }
 });
