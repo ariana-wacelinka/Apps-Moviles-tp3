@@ -1,14 +1,15 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -29,8 +30,10 @@ export default function CategoryDetailsScreen() {
   const [category, setCategory] = useState<Category | null>(null);
   const [recipes, setRecipes] = useState<MealPreview[]>([]);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
-  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);  const [errorCategory, setErrorCategory] = useState<string | null>(null);
+  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
+  const [errorCategory, setErrorCategory] = useState<string | null>(null);
   const [errorRecipes, setErrorRecipes] = useState<string | null>(null);
+
   const fetchCategoryDetails = useCallback(async () => {
     if (!categoryNameStr) return;
     
@@ -39,7 +42,8 @@ export default function CategoryDetailsScreen() {
     
     try {
       const response = await getAllCategories();
-      if (response.categories) {        const foundCategory = response.categories.find(
+      if (response.categories) {
+        const foundCategory = response.categories.find(
           cat => cat.strCategory === categoryNameStr
         );
         if (foundCategory) {
@@ -55,7 +59,8 @@ export default function CategoryDetailsScreen() {
       console.error(err);
     } finally {
       setIsLoadingCategory(false);
-    }  }, [categoryNameStr]);
+    }
+  }, [categoryNameStr]);
 
   const fetchRecipes = useCallback(async () => {
     if (!categoryNameStr) return;
@@ -78,6 +83,7 @@ export default function CategoryDetailsScreen() {
       setIsLoadingRecipes(false);
     }
   }, [categoryNameStr]);
+
   useEffect(() => {
     fetchCategoryDetails();
     fetchRecipes();
@@ -100,103 +106,114 @@ export default function CategoryDetailsScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
         <View style={styles.errorContainer}>
           <Text style={[styles.errorText, { color: themeColors.text }]}>{errorCategory}</Text>
-          <TouchableOpacity style={[styles.goBackButton, { backgroundColor: themeColors.tint }]} onPress={handleGoBack}>
+          <TouchableOpacity 
+            style={[styles.goBackButton, { backgroundColor: themeColors.primary }]} 
+            onPress={handleGoBack}
+          >
+            <MaterialIcons name="arrow-back" size={18} color="white" />
             <Text style={styles.goBackText}>Volver</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    );  }  return (
+    );
+  }
+
+  return (
     <>
       <Stack.Screen
         options={{
           headerShown: false,
         }}
       />
-        <SafeAreaView 
-          style={[styles.container, { backgroundColor: themeColors.background }]} 
-          edges={['top','bottom']}
+      <SafeAreaView 
+        style={[styles.container, { backgroundColor: themeColors.background }]} 
+        edges={['top','bottom']}
+      >
+        <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
+          <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <MaterialIcons 
+              name="arrow-back" 
+              size={24} 
+              color={themeColors.text} 
+            />
+          </TouchableOpacity>
+          {category && (
+            <Text style={[styles.categoryName, { color: themeColors.text }]}>{category.strCategory}</Text>
+          )}
+        </View>
+        <ScrollView 
+          style={[styles.scrollView, { backgroundColor: themeColors.background }]} 
+          showsVerticalScrollIndicator={false}
         >
-                <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
-                    <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-                        <Text style={[styles.backButtonText, { color: themeColors.tint }]}>Volver</Text>
-                    </TouchableOpacity>
-                    {category && (
-                        <Text style={[styles.categoryName, { color: themeColors.text }]}>{category.strCategory}</Text>
-                    )}
+          {category && (
+            <View style={[styles.categorySection, { borderBottomColor: themeColors.border }]}>
+              <View style={styles.categoryHeader}>
+                <Image source={{ uri: category.strCategoryThumb }} style={styles.categoryImage} />
+                <View style={styles.categoryInfo}>
+                  <Text style={[styles.categoryDescription, { color: themeColors.text }]} >
+                    {category.strCategoryDescription}
+                  </Text>
                 </View>
-              <ScrollView 
-                style={[styles.scrollView, { backgroundColor: themeColors.background }]} 
-                showsVerticalScrollIndicator={false}
-              >
-                  {category && (
-                        <View style={[styles.categorySection, { borderBottomColor: themeColors.border }]}>
-                          <View style={styles.categoryHeader}>
-                              <Image source={{ uri: category.strCategoryThumb }} style={styles.categoryImage} />
-                              <View style={styles.categoryInfo}>
-                                  <Text style={[styles.categoryDescription, { color: themeColors.text }]} >
-                                      {category.strCategoryDescription}
-                                  </Text>
-                              </View>
-                          </View>
-                        </View>
-                  )}
-                  <View style={styles.recipesSection}>
-                      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Recetas de {categoryNameStr} ({recipes.length})</Text>
+              </View>
+            </View>
+          )}
+          <View style={styles.recipesSection}>
+            <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Recetas de {categoryNameStr} ({recipes.length})</Text>
 
-                      {isLoadingRecipes && (
-                          <ActivityIndicator size="large" style={styles.loader} />
-                      )}
+            {isLoadingRecipes && (
+              <ActivityIndicator size="large" style={styles.loader} />
+            )}
 
-                      {errorRecipes && (
-                          <Text style={[styles.errorText, {color: themeColors.text}]}>{errorRecipes}</Text>
-                      )}
+            {errorRecipes && (
+              <Text style={[styles.errorText, {color: themeColors.text}]}>{errorRecipes}</Text>
+            )}
 
-                      {!isLoadingRecipes && !errorRecipes && recipes.length === 0 && (
-                          <Text style={[styles.infoText, { color: themeColors.text }]}>No se encontraron recetas para esta categoría.</Text>
-                      )}                      {recipes.length > 0 && (
-                          <FlatList
-                              data={recipes}
-                              keyExtractor={(item) => item.idMeal}
-                              renderItem={({ item }) => (
-                                  <MealSearchCard
-                                      meal={item}/>
-                              )}
-                              scrollEnabled={false}
-                              contentContainerStyle={styles.recipesList}
-                          />
-                      )}
-                  </View>
-              </ScrollView>
-          </SafeAreaView>
+            {!isLoadingRecipes && !errorRecipes && recipes.length === 0 && (
+              <Text style={[styles.infoText, { color: themeColors.text }]}>No se encontraron recetas para esta categoría.</Text>
+            )}
+
+            {recipes.length > 0 && (
+              <FlatList
+                data={recipes}
+                keyExtractor={(item) => item.idMeal}
+                renderItem={({ item }) => (
+                  <MealSearchCard meal={item}/>
+                )}
+                scrollEnabled={false}
+                contentContainerStyle={styles.recipesList}
+              />
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
   container: {
     flex: 1,
   },
   header: {
     paddingHorizontal: 15,
-    paddingTop: 15,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center'
   },
   backButton: {
-    paddingVertical: 5,
     position: 'absolute',
-    left: 20,
-    top: 15,
+    left: 15,
+    padding: 8,
+    borderRadius: 20,
+    zIndex: 1,
   },
-  backButtonText: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '500',
+  categoryName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -217,11 +234,6 @@ const styles = StyleSheet.create({
   },
   categoryInfo: {
     flex: 1,
-  },
-  categoryName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
   },
   categoryDescription: {
     fontSize: 14,
@@ -262,6 +274,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   goBackText: {
     color: 'white',

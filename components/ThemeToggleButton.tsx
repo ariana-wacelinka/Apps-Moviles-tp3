@@ -1,4 +1,5 @@
 import { useTheme } from '@/contexts/ThemeContext';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme as useNavigationTheme } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
@@ -7,16 +8,16 @@ export function ThemeToggleButton() {
   const { theme, toggleTheme } = useTheme();
   const navigationTheme = useNavigationTheme();
 
-  const getThemeIcon = () => { //ver de cambiar por iconos de react-native-vector-icons y ver de ubicar el boton en algun lugar mejor
+  const getThemeIcon = () => {
     switch (theme) {
       case 'light':
-        return '☀️';
+        return 'light-mode';
       case 'dark':
-        return '🌙';
+        return 'dark-mode';
       case 'auto':
-        return '🔄';
+        return 'brightness-auto';
       default:
-        return '🔄';
+        return 'brightness-auto';
     }
   };
 
@@ -45,7 +46,12 @@ export function ThemeToggleButton() {
       onPress={toggleTheme}
       activeOpacity={0.7}
     >
-      <Text style={styles.icon}>{getThemeIcon()}</Text>
+      <MaterialIcons 
+        name={getThemeIcon()} 
+        size={18} 
+        color={navigationTheme.colors.text}
+        style={styles.icon}
+      />
       <Text 
         style={[
           styles.text,
@@ -76,7 +82,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   icon: {
-    fontSize: 16,
     marginRight: 6,
   },
   text: {

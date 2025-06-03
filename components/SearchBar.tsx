@@ -1,6 +1,7 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface SearchBarProps {
   value: string;
@@ -26,8 +27,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={[styles.inputContainer, { backgroundColor: theme.dark ? theme.colors.card : '#f0f0f0' }]}>
-        
-        
+        <MaterialIcons 
+          name="search" 
+          size={20} 
+          color={theme.colors.text} 
+          style={styles.searchIcon}
+        />
         <TextInput
           style={[styles.input, { color: theme.colors.text }]}
           placeholder={placeholder}
@@ -38,16 +43,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onBlur={onBlur}
           onSubmitEditing={onSubmitEditing}
           returnKeyType="search"
-          clearButtonMode="while-editing"
         />
         {value.length > 0 && onClear && (
           <TouchableOpacity onPress={onClear} style={styles.clearButton}>
-            <Text style={[styles.clearIcon, { color: theme.colors.text }]}>✕</Text>
+            <MaterialIcons 
+              name="clear" 
+              size={20} 
+              color={theme.colors.text}
+            />
           </TouchableOpacity>
         )}
-        {(value.length === 0 || value == null) && (
-            <Text style={[styles.searchIcon, { color: theme.colors.text }]}>🔍</Text>
-            )}
       </View>
     </View>
   );
@@ -65,19 +70,16 @@ const styles = StyleSheet.create({
     height: 48,
   },
   searchIcon: {
-    fontSize: 18,
+    marginRight: 10,
   },
   input: {
     flex: 1,
     fontSize: 16,
   },
   clearButton: {
-    padding: 5,
-    marginLeft: 5,
+    padding: 4,
+    marginLeft: 8,
   },
-  clearIcon: {
-    fontSize: 16,
-  }
 });
 
 export default SearchBar;

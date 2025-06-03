@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import {
@@ -43,7 +44,8 @@ export const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = ({
     <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Volver</Text>
+          <MaterialIcons name="arrow-back" size={24} color="#fff" />
+          <Text style={styles.backButtonText}>Volver</Text>
         </TouchableOpacity>
         <Image source={{ uri: recipe.strMealThumb }} style={styles.image} />
       </View>
@@ -52,43 +54,90 @@ export const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = ({
         <Text style={[styles.title, { color: theme.colors.text }]}>{recipe.strMeal}</Text>
         
         <View style={styles.infoRow}>
-          <Text style={[styles.category, { color: theme.colors.text }]}>
-            Categoría: {recipe.strCategory}
-          </Text>
-          <Text style={[styles.area, { color: theme.colors.text }]}>
-            Origen: {recipe.strArea}
-          </Text>
+          <View style={styles.infoItem}>
+            <MaterialCommunityIcons 
+              name="tag" 
+              size={20} 
+              color={theme.colors.text} 
+              style={styles.infoIcon}
+            />
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>
+              {recipe.strCategory}
+            </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <MaterialIcons 
+              name="place" 
+              size={20} 
+              color={theme.colors.text} 
+              style={styles.infoIcon}
+            />
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>
+              {recipe.strArea}
+            </Text>
+          </View>
         </View>
 
         {recipe.strTags && (
-          <Text style={[styles.tags, { color: theme.colors.text }]}>
-            Tags: {recipe.strTags}
-          </Text>
+          <View style={styles.tagsContainer}>
+            <MaterialCommunityIcons 
+              name="tag-multiple" 
+              size={18} 
+              color={theme.colors.text} 
+              style={styles.infoIcon}
+            />
+            <Text style={[styles.tags, { color: theme.colors.text }]}>
+              {recipe.strTags}
+            </Text>
+          </View>
         )}
 
+        {/* Ingredientes */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { 
-            color: theme.colors.text,
-            borderBottomColor: theme.colors.border 
-          }]}>
-            Ingredientes
-          </Text>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons 
+              name="food-variant" 
+              size={24} 
+              color={theme.colors.text}
+              style={styles.sectionIcon}
+            />
+            <Text style={[styles.sectionTitle, { 
+              color: theme.colors.text,
+              borderBottomColor: theme.colors.border 
+            }]}>
+              Ingredientes
+            </Text>
+          </View>
           {ingredients.map((item, index) => (
             <View key={index} style={styles.ingredientRow}>
+              <MaterialIcons 
+                name="fiber-manual-record" 
+                size={8} 
+                color={theme.colors.text} 
+                style={styles.bulletIcon}
+              />
               <Text style={[styles.ingredientText, { color: theme.colors.text }]}>
-                • {item.measure} {item.ingredient}
+                {item.measure} {item.ingredient}
               </Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { 
-            color: theme.colors.text,
-            borderBottomColor: theme.colors.border 
-          }]}>
-            Instrucciones
-          </Text>
+          <View style={styles.sectionHeader}>
+            <MaterialCommunityIcons 
+              name="format-list-numbered" 
+              size={24} 
+              color={theme.colors.text}
+              style={styles.sectionIcon}
+            />
+            <Text style={[styles.sectionTitle, { 
+              color: theme.colors.text,
+              borderBottomColor: theme.colors.border 
+            }]}>
+              Instrucciones
+            </Text>
+          </View>
           <Text style={[styles.instructions, { color: theme.colors.text }]}>
             {recipe.strInstructions}
           </Text>
@@ -110,14 +159,18 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 10,
-    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   image: {
     width: '100%',
@@ -128,51 +181,74 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 16,
+    lineHeight: 32,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  category: {
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  infoIcon: {
+    marginRight: 6,
+  },
+  infoText: {
     fontSize: 16,
     fontWeight: '500',
-    opacity: 0.8,
   },
-  area: {
-    fontSize: 16,
-    fontWeight: '500',
-    opacity: 0.8,
+  tagsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   tags: {
     fontSize: 14,
     fontStyle: 'italic',
-    marginBottom: 20,
-    opacity: 0.7,
+    opacity: 0.8,
   },
   section: {
-    marginBottom: 25,
+    marginBottom: 28,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionIcon: {
+    marginRight: 8,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 15,
+    flex: 1,
     borderBottomWidth: 2,
     paddingBottom: 5,
   },
   ingredientRow: {
-    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    paddingLeft: 4,
+  },
+  bulletIcon: {
+    marginTop: 8,
+    marginRight: 12,
   },
   ingredientText: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 24,
+    flex: 1,
   },
   instructions: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 26,
     textAlign: 'justify',
   },
 });
