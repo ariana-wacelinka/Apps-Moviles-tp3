@@ -21,7 +21,7 @@ const FavoriteButton: React.FC<Props> = ({ meal, size = 24, color }) => {
     if (color) return color;
 
     if (isFavorite(meal.idMeal)) {
-      return effectiveTheme === 'dark' ? '#EF4444' : '#DC2626';
+      return effectiveTheme === 'dark' ? '#FCA5A5' : '#DC2626';
     } else {
       return effectiveTheme === 'dark' ? '#D1D5DB' : '#4B5563';
     }
