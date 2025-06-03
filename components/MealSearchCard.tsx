@@ -1,4 +1,5 @@
 import { useTheme } from '@react-navigation/native';
+import { router } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MealPreview } from '../types/recipes';
@@ -9,12 +10,16 @@ interface MealSearchCardProps {
   category?: string;
 }
 
-const handleMealPress = (meal: MealPreview) => {
-    console.log('Meal selected:', meal.idMeal);
-  };  
-
 const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, category }) => {
   const theme = useTheme();
+
+  const handleMealPress = (meal: MealPreview) => {
+    console.log('Meal selected:', meal.idMeal);
+    router.push({
+      pathname: '/recipe/[recipeId]',
+      params: { recipeId: meal.idMeal }
+    });
+  };
   
   return (
     <TouchableOpacity
