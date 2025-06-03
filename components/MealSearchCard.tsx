@@ -27,15 +27,21 @@ const MealSearchCard: React.FC<MealSearchCardProps> = ({ meal, category }) => {
       activeOpacity={0.7}
     >
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
-        <View style={styles.textContainer}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={[styles.name, { color: theme.colors.text }]} numberOfLines={2}>
+      <View style={styles.textContainer}>
+        <View style={styles.titleRow}>
+          <Text
+            style={[styles.name, { color: theme.colors.text }]}
+            numberOfLines={2}
+          >
             {meal.strMeal}
-            </Text>
-            <FavoriteButton meal={meal} />
-          </View>
-          {category != null && (
-            <Text style={[styles.category, { color: theme.colors.text }]} numberOfLines={1}>
+          </Text>
+          <FavoriteButton meal={meal} />
+        </View>
+        {category != null && (
+          <Text
+            style={[styles.category, { color: theme.colors.text }]}
+            numberOfLines={1}
+          >
             {category}
           </Text>
         )}
@@ -52,10 +58,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.18,
     shadowRadius: 1.00,
     elevation: 1,
@@ -71,10 +74,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
   name: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    flexShrink: 1,
+    maxWidth: '85%',
   },
   category: {
     fontSize: 13,
