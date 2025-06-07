@@ -5,24 +5,24 @@ import {
     Modal,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     Platform,
     KeyboardAvoidingView,
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
 export interface Fridge {
     id: string;
     name: string;
     ingredients: Ingredient[];
 }
-interface Ingredient {
-    id: string;
-    name: string;
-}
+interface Ingredient { id: string; name: string }
 
 interface FridgesViewProps {
     fridges?: Fridge[];
-    onCreate?: (name: string) => void;  // callback para cuando se crea
+    onCreate?: (name: string) => void;
 }
 
 export default function FridgesView({
@@ -31,6 +31,7 @@ export default function FridgesView({
                                     }: FridgesViewProps) {
     const [showModal, setShowModal] = useState(false);
     const [newName, setNewName] = useState('');
+    const { colors } = useTheme();
 
     const handleSave = () => {
         if (newName.trim()) {
@@ -41,7 +42,7 @@ export default function FridgesView({
     };
 
     return (
-        <View style={styles.container}>
+        <ThemedView style={styles.container}>
             <ThemedText style={styles.title}>Mis heladeras</ThemedText>
 
             {fridges.length === 0 ? (
@@ -49,7 +50,6 @@ export default function FridgesView({
                     <ThemedText style={styles.emptyText}>
                         No tenés heladeras creadas.
                     </ThemedText>
-
                     <TouchableOpacity
                         style={styles.createButton}
                         onPress={() => setShowModal(true)}
@@ -71,7 +71,7 @@ export default function FridgesView({
                             ))}
                         </View>
                     ))}
-                    {/* botón extra incluso si hay heladeras */}
+                    {/* Botón flotante para crear */}
                     <TouchableOpacity
                         style={styles.floatingButton}
                         onPress={() => setShowModal(true)}
@@ -81,37 +81,47 @@ export default function FridgesView({
                 </View>
             )}
 
-            {/* Modal para crear */}
             <Modal
                 visible={showModal}
-                animationType="slide"
+                animationType="fade"
                 transparent
                 onRequestClose={() => setShowModal(false)}
             >
+                <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+                    <View style={styles.overlay} />
+                </TouchableWithoutFeedback>
+
                 <KeyboardAvoidingView
                     style={styles.modalFlex}
-                    behavior={Platform.select({ ios: 'padding', android: undefined })}
+                    behavior={Platform.select({ ios: 'padding' })}
                 >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalCard}>
+                    <View style={styles.modalWrapper}>
+                        <ThemedView
+                            style={[
+                                styles.modalCard,
+                                { backgroundColor: colors.card, shadowColor: colors.text },
+                            ]}
+                        >
                             <ThemedText style={styles.modalTitle}>
                                 Nombre de la heladera
                             </ThemedText>
                             <TextInput
-                                style={styles.modalInput}
+                                style={[
+                                    styles.modalInput,
+                                    { borderColor: colors.border, color: colors.text },
+                                ]}
                                 placeholder="Ej. Heladera de casa"
+                                placeholderTextColor={colors.text + '99'}
                                 value={newName}
                                 onChangeText={setNewName}
                                 returnKeyType="done"
                                 onSubmitEditing={handleSave}
                             />
+
                             <View style={styles.modalButtons}>
                                 <TouchableOpacity
-                                    style={[styles.modalBtn, styles.modalCancel]}
-                                    onPress={() => {
-                                        setNewName('');
-                                        setShowModal(false);
-                                    }}
+                                    style={styles.modalBtn}
+                                    onPress={() => setShowModal(false)}
                                 >
                                     <ThemedText>Cancelar</ThemedText>
                                 </TouchableOpacity>
@@ -127,39 +137,101 @@ export default function FridgesView({
                                     <ThemedText style={styles.modalSaveText}>Guardar</ThemedText>
                                 </TouchableOpacity>
                             </View>
-                        </View>
+                        </ThemedView>
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
-        </View>
+        </ThemedView>
     );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 16 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
+
+    // overlay fullscreen semitransparente
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+
+    modalFlex: { flex: 1, justifyContent: 'center' },
+    modalWrapper: {
+        marginHorizontal: 24,
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    modalCard: {
+        padding: 16,
+        borderRadius: 12,
+        // sombra iOS/Android
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 6,
+    },
+
+    modalTitle: { fontSize: 18, marginBottom: 12 },
+    modalInput: {
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: 6,
+        padding: 12,
+        fontSize: 16,
+        marginBottom: 16,
+    },
+
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    modalBtn: {
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        marginLeft: 8,
+    },
+    modalBtnDisabled: { opacity: 0.5 },
+    modalSaveText: { fontWeight: '600' },
+    // Cuando no hay heladeras
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 24,
     },
-    emptyText: { fontSize: 16, marginBottom: 20, textAlign: 'center' },
+    emptyText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#888888',
+    },
     createButton: {
+        backgroundColor: '#007AFF',
         paddingHorizontal: 20,
         paddingVertical: 12,
         borderRadius: 8,
-        backgroundColor: '#007AFF',
     },
-    createButtonText: { fontSize: 16, fontWeight: '600', color: '#fff' },
-    list: { flex: 1 },
+    createButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
+
+    // Listado de heladeras
+    list: {
+        flex: 1,
+        paddingBottom: 16,
+    },
     itemContainer: {
         padding: 12,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderColor: '#ccc',
+        borderColor: '#CCCCCC',
     },
-    itemText: { fontSize: 16 },
+    itemText: {
+        fontSize: 16,
+        color: '#333333',
+    },
 
-    // botón flotante en lista
+    // Botón flotante “＋”
     floatingButton: {
         position: 'absolute',
         right: 24,
@@ -170,39 +242,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#007AFF',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 4,
+        elevation: 4,               // sombra Android
+        shadowColor: '#000000',     // sombra iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
     },
     floatingButtonText: {
         fontSize: 32,
         lineHeight: 32,
-        color: '#fff',
+        color: '#FFFFFF',
     },
-
-    // modal
-    modalFlex: { flex: 1 },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        justifyContent: 'center',
-        padding: 24,
-    },
-    modalCard: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-    },
-    modalTitle: { fontSize: 18, marginBottom: 12 },
-    modalInput: {
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: '#ccc',
-        borderRadius: 6,
-        padding: 12,
-        fontSize: 16,
-        marginBottom: 16,
-    },
-    modalButtons: { flexDirection: 'row', justifyContent: 'flex-end' },
-    modalBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 6 },
-    modalCancel: { marginRight: 8 },
-    modalBtnDisabled: { opacity: 0.5 },
-    modalSaveText: { color: '#007AFF', fontWeight: '600' },
 });
