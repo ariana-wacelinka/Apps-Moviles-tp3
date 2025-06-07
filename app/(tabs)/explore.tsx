@@ -1,11 +1,14 @@
 import { Platform, StyleSheet } from 'react-native';
 import FridgesView, { Fridge } from '../../components/FridgesView';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function TabTwoScreen() {
     const myFridges: Fridge[] = [];
   return (
-    <FridgesView fridges={myFridges}/>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <FridgesView fridges={myFridges}/>
+      </SafeAreaView>
   );
 }
 
@@ -22,4 +25,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
   },
+    safeArea: {
+        flex: 1,
+        backgroundColor: 'transparent',
+    },
 });
