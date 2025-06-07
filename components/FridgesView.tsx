@@ -32,6 +32,11 @@ export default function FridgesView({
     const [showModal, setShowModal] = useState(false);
     const [newName, setNewName] = useState('');
     const { colors } = useTheme();
+    const  [expandedFridgeId, setExpandedFridge] = useState<string | null>(null);
+
+    const toggleFridge = (fridgeId: string) => {
+      setExpandedFridge(prev => prev === fridgeId ? null : fridgeId);
+    };
 
     const handleSave = () => {
         if (newName.trim()) {
@@ -63,12 +68,29 @@ export default function FridgesView({
                 <View style={styles.list}>
                     {fridges.map((fridge) => (
                         <View key={fridge.id} style={styles.itemContainer}>
-                            <ThemedText style={styles.itemText}>{fridge.name}</ThemedText>
-                            {fridge.ingredients.map((ing) => (
-                                <ThemedText key={ing.id} style={styles.itemText}>
-                                    – {ing.name}
-                                </ThemedText>
-                            ))}
+                            <TouchableOpacity onPress={() => toggleFridge(fridge.id)}>
+                                <ThemedText style={styles.itemText}>{fridge.name}</ThemedText>
+                            </TouchableOpacity>
+
+                            {expandedFridgeId === fridge.id && (
+                                <View style={styles.expandedSection}>
+                                    {fridge.ingredients.map((ing) => (
+                                        <ThemedText key={ing.id} style={styles.ingredientText}>
+                                            – {ing.name}
+                                        </ThemedText>
+                                    ))}
+
+                                    <TouchableOpacity style={styles.button}>
+                                        <ThemedText style={styles.buttonText}>Agregar ingrediente</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.button}>
+                                        <ThemedText style={styles.buttonText}>Eliminar todos</ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.buttonDelete}>
+                                        <ThemedText style={styles.buttonText}>Eliminar heladera</ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
                         </View>
                     ))}
                     {/* Botón flotante para crear */}
@@ -252,5 +274,30 @@ const styles = StyleSheet.create({
         fontSize: 32,
         lineHeight: 32,
         color: '#FFFFFF',
+    },
+    expandedSection: {
+        marginTop: 8,
+        paddingLeft: 10,
+    },
+    ingredientText: {
+        fontSize: 16,
+        marginVertical: 2,
+    },
+    button: {
+        marginTop: 8,
+        padding: 8,
+        backgroundColor: '#4CAF50',
+        borderRadius: 6,
+    },
+    buttonDelete: {
+        marginTop: 8,
+        padding: 8,
+        backgroundColor: '#F44336',
+        borderRadius: 6,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
     },
 });
