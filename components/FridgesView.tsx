@@ -8,12 +8,13 @@ import {
     TouchableWithoutFeedback,
     Platform,
     KeyboardAvoidingView,
-    ScrollView,
+    ScrollView, ActivityIndicator, FlatList,
 } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {getAllIngredients, searchRecipesByName} from "@/services/theMealDbService";
 
 export interface Fridge {
     id: string;
@@ -29,16 +30,27 @@ interface Ingredient {
 interface FridgesViewProps {
     fridges?: Fridge[];
     onCreate?: (name: string) => void;
+    onAddIngredient?: (fridgeId: string, ingredient: Ingredient) => void;
+    onClear?: (fridgeId: string) => void;
+    onDelete?: (fridgeId: string) => void;
 }
 
 export default function FridgesView({
     fridges = [],
     onCreate = () => {},
+    onAddIngredient = () => {},
+    onClear = () => {},
+    onDelete = () => {},
 }: FridgesViewProps) {
     const [showModal, setShowModal] = useState(false);
     const [newName, setNewName] = useState('');
     const { colors } = useTheme();
     const [expandedFridgeId, setExpandedFridge] = useState<string | null>(null);
+    const [searchModalVisible, setSearchModalVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<Ingredient[]>([]);
+    const [loadingSearch, setLoadingSearch] = useState(false);
+    const [currentFridgeId, setCurrentFridgeId] = useState<string | null>(null);
 
     const toggleFridge = (fridgeId: string) => {
         setExpandedFridge(prev => prev === fridgeId ? null : fridgeId);
@@ -50,6 +62,53 @@ export default function FridgesView({
             setNewName('');
             setShowModal(false);
         }
+    };
+
+    const openSearchModal = (fridgeId: string) => {
+        setCurrentFridgeId(fridgeId);
+        setSearchQuery('');
+        setSearchResults([]);
+        setSearchModalVisible(true);
+    };
+
+    /** Llama a tu API para buscar ingredientes */
+    const searchIngredients = async () => {
+        if (!searchQuery.trim()) return;
+        setLoadingSearch(true);
+
+        try {
+            // 1) Obtiene todo el catálogo de ingredientes
+            const all = await getAllIngredients();
+
+            // 2) Filtra por la query (case-insensitive)
+            const filtered = all.filter(item =>
+                item.strIngredient
+                    .toLowerCase()
+                    .includes(searchQuery.trim().toLowerCase())
+            );
+
+            // 3) Mapea al tipo que usa tu UI
+            const items: Ingredient[] = filtered.map(item => ({
+                id: item.idIngredient,
+                name: item.strIngredient,
+            }));
+
+            setSearchResults(items);
+        } catch (error) {
+            console.error('Error al filtrar ingredientes:', error);
+            setSearchResults([]);
+        } finally {
+            setLoadingSearch(false);
+        }
+    };
+
+
+    /** Cuando el usuario elige un ingrediente de la lista */
+    const handleSelectIngredient = (ingredient: Ingredient) => {
+        if (currentFridgeId) {
+            onAddIngredient(currentFridgeId, ingredient);
+        }
+        setSearchModalVisible(false);
     };
 
     return (
@@ -160,7 +219,10 @@ export default function FridgesView({
                                     )}
 
                                     <View style={styles.actionsContainer}>
-                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}>
+                                        <TouchableOpacity
+                                           style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}
+                                           onPress={() => openSearchModal(fridge.id)}
+                                         >
                                             <MaterialIcons name="add" size={16} color={colors.text} />
                                             <ThemedText style={[styles.actionButtonText, { color: colors.text }]}>
                                                 Agregar Ingrediente
@@ -275,6 +337,86 @@ export default function FridgesView({
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
+            <Modal
+                visible={searchModalVisible}
+                animationType="slide"
+                transparent
+                onRequestClose={() => setSearchModalVisible(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setSearchModalVisible(false)}>
+                    <View style={styles.overlay} />
+                </TouchableWithoutFeedback>
+                <KeyboardAvoidingView
+                    style={styles.modalFlex}
+                    behavior={Platform.select({ ios: 'padding' })}
+                >
+                    <View style={styles.modalWrapper}>
+                        <ThemedView style={[styles.modalCard, {
+                            backgroundColor: colors.card,
+                            shadowColor: colors.text,
+                            borderColor: colors.border,
+                        }]}>
+                            <View style={styles.modalHeader}>
+                                <MaterialCommunityIcons name="food" size={24} color={colors.primary} />
+                                <ThemedText style={[styles.modalTitle, { color: colors.text }]}>
+                                    Buscar Ingrediente
+                                </ThemedText>
+                            </View>
+
+                            <TextInput
+                                style={[styles.modalInput, {
+                                    borderColor: colors.border,
+                                    color: colors.text,
+                                    backgroundColor: colors.background,
+                                }]}
+                                placeholder="Ej. Tomate"
+                                placeholderTextColor={colors.text + '60'}
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                returnKeyType="search"
+                                onSubmitEditing={searchIngredients}
+                            />
+
+                            {loadingSearch ? (
+                                <ActivityIndicator style={{ marginVertical: 20 }} />
+                            ) : (
+                                <FlatList
+                                    data={searchResults}
+                                    keyExtractor={item => item.id}
+                                    style={{ maxHeight: 200 }}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            style={styles.searchItem}
+                                            onPress={() => handleSelectIngredient(item)}
+                                        >
+                                            <ThemedText style={[styles.ingredientText, { color: colors.text }]}>
+                                                {item.name}
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                    )}
+                                    ListEmptyComponent={() =>
+                                        searchQuery ? (
+                                            <ThemedText style={[styles.emptySubtext, { color: colors.text + '80' }]}>
+                                                No se encontraron resultados
+                                            </ThemedText>
+                                        ) : null
+                                    }
+                                />
+                            )}
+
+                            <View style={styles.modalButtons}>
+                                <TouchableOpacity
+                                    style={[styles.modalBtn, { backgroundColor: colors.text + '10' }]}
+                                    onPress={() => setSearchModalVisible(false)}
+                                >
+                                    <ThemedText style={{ color: colors.text }}>Cancelar</ThemedText>
+                                </TouchableOpacity>
+                            </View>
+                        </ThemedView>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
+
         </ThemedView>
     );
 }
@@ -526,5 +668,11 @@ const styles = StyleSheet.create({
     modalSaveText: { 
         fontWeight: '600', 
         color: '#FFFFFF',
+    },
+    searchItem: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderBottomWidth: 1,
+        borderColor: '#DDD',
     },
 });
