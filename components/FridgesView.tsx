@@ -31,7 +31,7 @@ interface FridgesViewProps {
     fridges?: Fridge[];
     onCreate?: (name: string) => void;
     onAddIngredient?: (fridgeId: string, ingredient: Ingredient) => void;
-    onClear?: (fridgeId: string) => void;
+    onClearFridge?: (fridgeId: string) => void;
     onDelete?: (fridgeId: string) => void;
 }
 
@@ -39,7 +39,7 @@ export default function FridgesView({
     fridges = [],
     onCreate = () => {},
     onAddIngredient = () => {},
-    onClear = () => {},
+    onClearFridge = () => {},
     onDelete = () => {},
 }: FridgesViewProps) {
     const [showModal, setShowModal] = useState(false);
@@ -110,6 +110,12 @@ export default function FridgesView({
         }
         setSearchModalVisible(false);
     };
+
+    const handleClearFridge = (fridgeId: string) => {
+        if (onClearFridge) {
+            onClearFridge(fridgeId);
+        }
+    }
 
     return (
         <ThemedView style={styles.container}>
@@ -229,7 +235,8 @@ export default function FridgesView({
                                             </ThemedText>
                                         </TouchableOpacity>
                                         
-                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF9800' + '15' }]}>
+                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF9800' + '15' }]}
+                                                          onPress={() => handleClearFridge(fridge.id)}>
                                             <MaterialIcons name="clear-all" size={16} color="#FF9800" />
                                             <ThemedText style={[styles.actionButtonText, { color: '#FF9800' }]}>
                                                 Vaciar

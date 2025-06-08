@@ -46,7 +46,7 @@ export default function TabTwoScreen() {
                 fridges={fridges}
                 onCreate={handleCreateFridge}
                 onAddIngredient={handleAddIngredient}
-                onClear={handleClearFridge}
+                onClearFridge={handleClearFridge}
                 onDelete={handleDeleteFridge}
             />
         </SafeAreaView>
