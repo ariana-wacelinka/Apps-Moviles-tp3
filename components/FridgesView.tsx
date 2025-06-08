@@ -117,6 +117,14 @@ export default function FridgesView({
         }
     }
 
+    const handleDeleteFridge = (fridgeId: string) => {
+        if (onDelete) {
+            onDelete(fridgeId);
+        }
+        setExpandedFridge(null); // Cierra la sección si estaba abierta
+        setSearchModalVisible(false); // Cierra el modal de búsqueda si estaba abierto
+    }
+
     return (
         <ThemedView style={styles.container}>
             <View style={styles.titleContainer}>
@@ -243,7 +251,8 @@ export default function FridgesView({
                                             </ThemedText>
                                         </TouchableOpacity>
                                         
-                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#F44336' + '15' }]}>
+                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#F44336' + '15' }]}
+                                                          onPress={() => handleDeleteFridge(fridge.id)}>
                                             <MaterialIcons name="delete" size={16} color="#F44336" />
                                             <ThemedText style={[styles.actionButtonText, { color: '#F44336' }]}>
                                                 Eliminar
