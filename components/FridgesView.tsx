@@ -161,8 +161,8 @@ export default function FridgesView({
 
                                     <View style={styles.actionsContainer}>
                                         <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}>
-                                            <MaterialIcons name="add" size={16} color={colors.primary} />
-                                            <ThemedText style={[styles.actionButtonText, { color: colors.primary }]}>
+                                            <MaterialIcons name="add" size={16} color={colors.text} />
+                                            <ThemedText style={[styles.actionButtonText, { color: colors.text }]}>
                                                 Agregar Ingrediente
                                             </ThemedText>
                                         </TouchableOpacity>
