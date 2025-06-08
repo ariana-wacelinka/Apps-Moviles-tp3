@@ -22,7 +22,7 @@ export interface Fridge {
     ingredients: Ingredient[];
 }
 
-interface Ingredient { 
+export interface Ingredient {
     id: string; 
     name: string;
 }
@@ -105,7 +105,7 @@ export default function FridgesView({
 
     /** Cuando el usuario elige un ingrediente de la lista */
     const handleSelectIngredient = (ingredient: Ingredient) => {
-        if (currentFridgeId) {
+        if (currentFridgeId && onAddIngredient) {
             onAddIngredient(currentFridgeId, ingredient);
         }
         setSearchModalVisible(false);
