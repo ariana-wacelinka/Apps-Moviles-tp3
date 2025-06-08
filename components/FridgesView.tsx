@@ -8,7 +8,9 @@ import {
     TouchableWithoutFeedback,
     Platform,
     KeyboardAvoidingView,
+    ScrollView,
 } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -18,7 +20,11 @@ export interface Fridge {
     name: string;
     ingredients: Ingredient[];
 }
-interface Ingredient { id: string; name: string }
+
+interface Ingredient { 
+    id: string; 
+    name: string;
+}
 
 interface FridgesViewProps {
     fridges?: Fridge[];
@@ -26,16 +32,16 @@ interface FridgesViewProps {
 }
 
 export default function FridgesView({
-                                        fridges = [],
-                                        onCreate = () => {},
-                                    }: FridgesViewProps) {
+    fridges = [],
+    onCreate = () => {},
+}: FridgesViewProps) {
     const [showModal, setShowModal] = useState(false);
     const [newName, setNewName] = useState('');
     const { colors } = useTheme();
-    const  [expandedFridgeId, setExpandedFridge] = useState<string | null>(null);
+    const [expandedFridgeId, setExpandedFridge] = useState<string | null>(null);
 
     const toggleFridge = (fridgeId: string) => {
-      setExpandedFridge(prev => prev === fridgeId ? null : fridgeId);
+        setExpandedFridge(prev => prev === fridgeId ? null : fridgeId);
     };
 
     const handleSave = () => {
@@ -48,59 +54,147 @@ export default function FridgesView({
 
     return (
         <ThemedView style={styles.container}>
-            <ThemedText style={styles.title}>Mis heladeras</ThemedText>
+            <View style={styles.titleContainer}>
+                <MaterialCommunityIcons 
+                    name="fridge" 
+                    size={28} 
+                    color={colors.primary}
+                    style={styles.titleIcon}
+                />
+                <ThemedText style={styles.title}>Mis Heladeras</ThemedText>
+            </View>
 
             {fridges.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                    <ThemedText style={styles.emptyText}>
-                        No tenés heladeras creadas.
+                    <MaterialCommunityIcons 
+                        name="fridge-off" 
+                        size={80} 
+                        color={colors.text + '40'}
+                        style={styles.emptyIcon}
+                    />
+                    <ThemedText style={[styles.emptyText, { color: colors.text + 'AA' }]}>
+                        No tenés heladeras creadas
+                    </ThemedText>
+                    <ThemedText style={[styles.emptySubtext, { color: colors.text + '80' }]}>
+                        Creá tu primera heladera para empezar a organizarte
                     </ThemedText>
                     <TouchableOpacity
-                        style={styles.createButton}
+                        style={[styles.createButton, { backgroundColor: colors.primary }]}
                         onPress={() => setShowModal(true)}
                     >
+                        <MaterialIcons name="add" size={20} color="#FFFFFF" />
                         <ThemedText style={styles.createButtonText}>
-                            Crear nueva heladera
+                            Crear Nueva Heladera
                         </ThemedText>
                     </TouchableOpacity>
                 </View>
             ) : (
-                <View style={styles.list}>
+                <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
                     {fridges.map((fridge) => (
-                        <View key={fridge.id} style={styles.itemContainer}>
-                            <TouchableOpacity onPress={() => toggleFridge(fridge.id)}>
-                                <ThemedText style={styles.itemText}>{fridge.name}</ThemedText>
+                        <ThemedView 
+                            key={fridge.id} 
+                            style={[
+                                styles.fridgeCard,
+                                { 
+                                    backgroundColor: colors.card,
+                                    borderColor: colors.border,
+                                }
+                            ]}
+                        >
+                            <TouchableOpacity 
+                                onPress={() => toggleFridge(fridge.id)}
+                                style={styles.fridgeHeader}
+                                activeOpacity={0.7}
+                            >
+                                <View style={styles.fridgeInfo}>
+                                    <View style={[styles.fridgeIconContainer, { backgroundColor: colors.primary }]}>
+                                        <MaterialCommunityIcons 
+                                            name="fridge" 
+                                            size={24} 
+                                            color="#fff"
+                                        />
+                                    </View>
+                                    <View style={styles.fridgeDetails}>
+                                        <ThemedText style={styles.fridgeName}>
+                                            {fridge.name}
+                                        </ThemedText>
+                                        <ThemedText style={[styles.fridgeCount, { color: colors.text + '80' }]}>
+                                            {fridge.ingredients.length} ingredientes
+                                        </ThemedText>
+                                    </View>
+                                </View>
+                                <MaterialIcons 
+                                    name={expandedFridgeId === fridge.id ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+                                    size={24} 
+                                    color={colors.text + '60'}
+                                />
                             </TouchableOpacity>
 
                             {expandedFridgeId === fridge.id && (
-                                <View style={styles.expandedSection}>
-                                    {fridge.ingredients.map((ing) => (
-                                        <ThemedText key={ing.id} style={styles.ingredientText}>
-                                            – {ing.name}
-                                        </ThemedText>
-                                    ))}
+                                <View style={[styles.fridgeContent, { borderTopColor: colors.border }]}>
+                                    {fridge.ingredients.length === 0 ? (
+                                        <View style={styles.noIngredientsContainer}>
+                                            <MaterialCommunityIcons 
+                                                name="food-off" 
+                                                size={24} 
+                                                color={colors.text + '60'}
+                                            />
+                                            <ThemedText style={[styles.noIngredientsText, { color: colors.text + '80' }]}>
+                                                No hay ingredientes
+                                            </ThemedText>
+                                        </View>
+                                    ) : (
+                                        fridge.ingredients.map((ing, ingIndex) => (
+                                            <View key={ing.id} style={styles.ingredientRow}>
+                                                <MaterialIcons 
+                                                    name="fiber-manual-record" 
+                                                    size={6} 
+                                                    color={colors.primary}
+                                                    style={styles.bulletIcon}
+                                                />
+                                                <ThemedText style={[styles.ingredientText, { color: colors.text }]}>
+                                                    {ing.name}
+                                                </ThemedText>
+                                            </View>
+                                        ))
+                                    )}
 
-                                    <TouchableOpacity style={styles.button}>
-                                        <ThemedText style={styles.buttonText}>Agregar ingrediente</ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button}>
-                                        <ThemedText style={styles.buttonText}>Eliminar todos</ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={styles.buttonDelete}>
-                                        <ThemedText style={styles.buttonText}>Eliminar heladera</ThemedText>
-                                    </TouchableOpacity>
+                                    <View style={styles.actionsContainer}>
+                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary + '15' }]}>
+                                            <MaterialIcons name="add" size={16} color={colors.primary} />
+                                            <ThemedText style={[styles.actionButtonText, { color: colors.primary }]}>
+                                                Agregar Ingrediente
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                        
+                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF9800' + '15' }]}>
+                                            <MaterialIcons name="clear-all" size={16} color="#FF9800" />
+                                            <ThemedText style={[styles.actionButtonText, { color: '#FF9800' }]}>
+                                                Vaciar
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                        
+                                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#F44336' + '15' }]}>
+                                            <MaterialIcons name="delete" size={16} color="#F44336" />
+                                            <ThemedText style={[styles.actionButtonText, { color: '#F44336' }]}>
+                                                Eliminar
+                                            </ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             )}
-                        </View>
+                        </ThemedView>
                     ))}
-                    {/* Botón flotante para crear */}
-                    <TouchableOpacity
-                        style={styles.floatingButton}
-                        onPress={() => setShowModal(true)}
-                    >
-                        <ThemedText style={styles.floatingButtonText}>＋</ThemedText>
-                    </TouchableOpacity>
-                </View>
+                </ScrollView>
+            )}
+
+            {fridges.length > 0 && (
+                <TouchableOpacity
+                    style={[styles.floatingButton, { backgroundColor: colors.primary }]}
+                    onPress={() => setShowModal(true)}
+                >
+                    <MaterialIcons name="add" size={28} color="#FFFFFF" />
+                </TouchableOpacity>
             )}
 
             <Modal
@@ -121,36 +215,54 @@ export default function FridgesView({
                         <ThemedView
                             style={[
                                 styles.modalCard,
-                                { backgroundColor: colors.card, shadowColor: colors.text },
+                                { 
+                                    backgroundColor: colors.card, 
+                                    shadowColor: colors.text,
+                                    borderColor: colors.border,
+                                },
                             ]}
                         >
-                            <ThemedText style={styles.modalTitle}>
-                                Nombre de la heladera
-                            </ThemedText>
+                            <View style={styles.modalHeader}>
+                                <MaterialCommunityIcons 
+                                    name="plus" 
+                                    size={24} 
+                                    color={colors.primary}
+                                />
+                                <ThemedText style={[styles.modalTitle, { color: colors.text }]}>
+                                    Nueva Heladera
+                                </ThemedText>
+                            </View>
+                            
                             <TextInput
                                 style={[
                                     styles.modalInput,
-                                    { borderColor: colors.border, color: colors.text },
+                                    { 
+                                        borderColor: colors.border, 
+                                        color: colors.text,
+                                        backgroundColor: colors.background,
+                                    },
                                 ]}
                                 placeholder="Ej. Heladera de casa"
-                                placeholderTextColor={colors.text + '99'}
+                                placeholderTextColor={colors.text + '60'}
                                 value={newName}
                                 onChangeText={setNewName}
                                 returnKeyType="done"
                                 onSubmitEditing={handleSave}
+                                autoFocus
                             />
 
                             <View style={styles.modalButtons}>
                                 <TouchableOpacity
-                                    style={styles.modalBtn}
+                                    style={[styles.modalBtn, { backgroundColor: colors.text + '10' }]}
                                     onPress={() => setShowModal(false)}
                                 >
-                                    <ThemedText>Cancelar</ThemedText>
+                                    <ThemedText style={{ color: colors.text }}>Cancelar</ThemedText>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
                                     style={[
                                         styles.modalBtn,
+                                        { backgroundColor: colors.primary },
                                         !newName.trim() && styles.modalBtnDisabled,
                                     ]}
                                     onPress={handleSave}
@@ -168,69 +280,52 @@ export default function FridgesView({
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16 },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
-
-    // overlay fullscreen semitransparente
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-    },
-
-    modalFlex: { flex: 1, justifyContent: 'center' },
-    modalWrapper: {
-        marginHorizontal: 24,
-        borderRadius: 12,
-        overflow: 'hidden',
-    },
-    modalCard: {
+    container: { 
+        flex: 1, 
         padding: 16,
-        borderRadius: 12,
-        // sombra iOS/Android
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 6,
     },
-
-    modalTitle: { fontSize: 18, marginBottom: 12 },
-    modalInput: {
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 6,
-        padding: 12,
-        fontSize: 16,
-        marginBottom: 16,
-    },
-
-    modalButtons: {
+    titleContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginBottom: 24,
     },
-    modalBtn: {
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        marginLeft: 8,
+    titleIcon: {
+        marginRight: 12,
     },
-    modalBtnDisabled: { opacity: 0.5 },
-    modalSaveText: { fontWeight: '600' },
-    // Cuando no hay heladeras
+    title: { 
+        fontSize: 28, 
+        fontWeight: 'bold',
+    },
+
+    // Estado vacío
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 32,
+    },
+    emptyIcon: {
+        marginBottom: 16,
     },
     emptyText: {
-        fontSize: 16,
-        marginBottom: 20,
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 8,
         textAlign: 'center',
-        color: '#888888',
+    },
+    emptySubtext: {
+        fontSize: 14,
+        marginBottom: 32,
+        textAlign: 'center',
+        lineHeight: 20,
     },
     createButton: {
-        backgroundColor: '#007AFF',
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        borderRadius: 12,
+        gap: 8,
     },
     createButtonText: {
         fontSize: 16,
@@ -238,66 +333,198 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
 
-    // Listado de heladeras
+    // Lista de heladeras
     list: {
         flex: 1,
-        paddingBottom: 16,
     },
     itemContainer: {
-        padding: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderColor: '#CCCCCC',
+        marginBottom: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
     },
-    itemText: {
-        fontSize: 16,
-        color: '#333333',
+    fridgeCard: {
+        borderRadius: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
+    },
+    fridgeHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 20,
+    },
+    fridgeInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    fridgeIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
+    },
+    fridgeDetails: {
+        flex: 1,
+    },
+    fridgeName: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    fridgeCount: {
+        fontSize: 14,
+        fontWeight: '400',
+    },
+    fridgeContent: {
+        borderTopWidth: 1,
+        padding: 20,
+        paddingTop: 16,
+    },
+    
+    // Sección expandida
+    expandedSection: {
+        paddingTop: 16,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        borderTopWidth: 1,
+    },
+    noIngredientsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+        gap: 8,
+    },
+    noIngredientsText: {
+        fontSize: 14,
+        fontStyle: 'italic',
+    },
+    ingredientRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 4,
+        paddingLeft: 8,
+    },
+    bulletIcon: {
+        marginRight: 12,
+    },
+    ingredientText: {
+        fontSize: 15,
+        flex: 1,
     },
 
-    // Botón flotante “＋”
+    // Acciones
+    actionsContainer: {
+        marginTop: 16,
+        gap: 8,
+    },
+    actionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        gap: 6,
+    },
+    actionButtonText: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+
+    // Botón flotante
     floatingButton: {
         position: 'absolute',
-        right: 24,
-        bottom: 24,
+        right: 20,
+        bottom: 20,
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#007AFF',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 4,               // sombra Android
-        shadowColor: '#000000',     // sombra iOS
-        shadowOffset: { width: 0, height: 2 },
+        elevation: 6,
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
-        shadowRadius: 4,
+        shadowRadius: 6,
     },
-    floatingButtonText: {
-        fontSize: 32,
-        lineHeight: 32,
-        color: '#FFFFFF',
+
+    // Modal
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
-    expandedSection: {
-        marginTop: 8,
-        paddingLeft: 10,
+    modalFlex: { 
+        flex: 1, 
+        justifyContent: 'center',
     },
-    ingredientText: {
+    modalWrapper: {
+        marginHorizontal: 24,
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+    modalCard: {
+        padding: 24,
+        borderRadius: 16,
+        borderWidth: 1,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 16,
+        elevation: 8,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        gap: 12,
+    },
+    modalTitle: { 
+        fontSize: 20, 
+        fontWeight: '600',
+    },
+    modalInput: {
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 14,
         fontSize: 16,
-        marginVertical: 2,
+        marginBottom: 24,
     },
-    button: {
-        marginTop: 8,
-        padding: 8,
-        backgroundColor: '#4CAF50',
-        borderRadius: 6,
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 12,
     },
-    buttonDelete: {
-        marginTop: 8,
-        padding: 8,
-        backgroundColor: '#F44336',
-        borderRadius: 6,
+    modalBtn: {
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 8,
+        minWidth: 80,
+        alignItems: 'center',
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 14,
-        textAlign: 'center',
+    modalBtnDisabled: { 
+        opacity: 0.5,
+    },
+    modalSaveText: { 
+        fontWeight: '600', 
+        color: '#FFFFFF',
     },
 });
