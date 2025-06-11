@@ -33,6 +33,7 @@ interface FridgesViewProps {
     onAddIngredient?: (fridgeId: string, ingredient: Ingredient) => void;
     onClearFridge?: (fridgeId: string) => void;
     onDelete?: (fridgeId: string) => void;
+    onRemoveIngredient?: (fridgeId: string, ingredientId: string) => void;
 }
 
 export default function FridgesView({
@@ -41,6 +42,7 @@ export default function FridgesView({
     onAddIngredient = () => {},
     onClearFridge = () => {},
     onDelete = () => {},
+    onRemoveIngredient = () => {},
 }: FridgesViewProps) {
     const [showModal, setShowModal] = useState(false);
     const [newName, setNewName] = useState('');
@@ -124,6 +126,12 @@ export default function FridgesView({
         setExpandedFridge(null); // Cierra la sección si estaba abierta
         setSearchModalVisible(false); // Cierra el modal de búsqueda si estaba abierto
     }
+
+    const handleRemoveIngredient = (fridgeId: string, ingredientId: string) => {
+        if (onRemoveIngredient) {
+            onRemoveIngredient(fridgeId, ingredientId);
+        }
+    };
 
     return (
         <ThemedView style={styles.container}>
@@ -217,17 +225,25 @@ export default function FridgesView({
                                             </ThemedText>
                                         </View>
                                     ) : (
-                                        fridge.ingredients.map((ing, ingIndex) => (
+                                        fridge.ingredients.map((ing) => (
                                             <View key={ing.id} style={styles.ingredientRow}>
-                                                <MaterialIcons 
-                                                    name="fiber-manual-record" 
-                                                    size={6} 
+                                                <MaterialIcons
+                                                    name="fiber-manual-record"
+                                                    size={6}
                                                     color={colors.primary}
                                                     style={styles.bulletIcon}
                                                 />
                                                 <ThemedText style={[styles.ingredientText, { color: colors.text }]}>
                                                     {ing.name}
                                                 </ThemedText>
+
+                                                {/* Botón para eliminar solo este ingrediente */}
+                                                <TouchableOpacity
+                                                    style={styles.removeIngredientButton}
+                                                    onPress={() => handleRemoveIngredient?.(fridge.id, ing.id)}
+                                                >
+                                                    <MaterialIcons name="delete" size={18} color="#F44336" />
+                                                </TouchableOpacity>
                                             </View>
                                         ))
                                     )}
@@ -690,5 +706,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderBottomWidth: 1,
         borderColor: '#DDD',
+    },
+    removeIngredientButton: {
+        marginLeft: 12,
+        padding: 4,
     },
 });
