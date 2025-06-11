@@ -3,6 +3,17 @@ import { Meal, MealPreviewsResponse, MealsResponse } from '../types/recipes';
 
 const API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1/';
 
+export interface RawIngredient {
+    idIngredient: string;
+    strIngredient: string;
+    strDescription: string | null;
+    strType: string | null;
+}
+
+export interface IngredientListResponse {
+    meals: RawIngredient[] | null;
+}
+
 export const searchRecipesByName = async (query: string): Promise<MealsResponse> => {
     try {
         const response = await fetch(`${API_BASE_URL}search.php?s=${encodeURIComponent(query)}`);
@@ -28,6 +39,20 @@ export const getAllCategories = async (): Promise<CategoriesResponse> => {
     } catch (error) {
         console.error('Error al obtener las categorías:', error);
         return { categories: [] };
+    }
+};
+
+export const getAllIngredients = async (): Promise<RawIngredient[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}list.php?i=list`);
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+        }
+        const data: IngredientListResponse = await response.json();
+        return data.meals ?? [];
+    } catch (error) {
+        console.error('Error al obtener todos los ingredientes:', error);
+        return [];
     }
 };
 
