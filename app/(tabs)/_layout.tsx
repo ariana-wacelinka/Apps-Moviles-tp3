@@ -35,10 +35,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="MyFridges"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="compass" size={22} color={color} />,
+          title: 'Mis heladeras',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="fridge" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
